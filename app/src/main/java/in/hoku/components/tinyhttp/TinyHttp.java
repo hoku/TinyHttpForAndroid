@@ -10,6 +10,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
+ * Name:    TinyHttp
+ * URL:     https://github.com/hoku/TinyHttpForAndroid
+ * License: CC0
+ * <p/>
  * Created by hoku.
  */
 public class TinyHttp {
