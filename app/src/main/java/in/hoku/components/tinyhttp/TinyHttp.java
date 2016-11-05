@@ -1,5 +1,7 @@
 package in.hoku.components.tinyhttp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 
 import java.io.BufferedReader;
@@ -18,21 +20,30 @@ import java.net.URL;
  */
 public class TinyHttp {
 
-    public interface OnTinyHttpStateListener {
-        public void done(String result);
+    public interface OnTinyHttpLoadedTextListener {
+        void done(String result);
+    }
+
+    public interface OnTinyHttpLoadedImageListener {
+        void done(Bitmap result);
     }
 
     private String responseEncoding = null;
+
 
     public void setResponseContentEncoding(String responseContentEncoding) {
         responseEncoding = responseContentEncoding;
     }
 
-    public void getText(final String url, final OnTinyHttpStateListener l) {
+    public String getText(final String url) {
+        return requestString(url);
+    }
+
+    public void getTextAsync(final String url, final OnTinyHttpLoadedTextListener l) {
         AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
-                return request(url);
+                return getText(url);
             }
 
             @Override
@@ -45,7 +56,29 @@ public class TinyHttp {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    private String request(String url) {
+    public Bitmap getImage(final String url) {
+        return requestBitmap(url);
+    }
+
+    public void getImageAsync(final String url, final OnTinyHttpLoadedImageListener l) {
+        AsyncTask<Void, Void, Bitmap> task = new AsyncTask<Void, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                return getImage(url);
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap result) {
+                if (l != null) {
+                    l.done(result);
+                }
+            }
+        };
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+
+    private String requestString(String url) {
         HttpURLConnection connection = null;
 
         try {
@@ -60,7 +93,6 @@ public class TinyHttp {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 InputStream in = connection.getInputStream();
                 String encoding = connection.getContentEncoding();
-                connection.getContentEncoding();
 
                 InputStreamReader isr;
                 if (encoding != null) {
@@ -87,14 +119,45 @@ public class TinyHttp {
             e.printStackTrace();
 
         } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-
+            if (connection != null) connection.disconnect();
         }
 
         return null;
     }
+
+
+    private Bitmap requestBitmap(String url) {
+        HttpURLConnection connection = null;
+
+        try {
+            final URL targetUrl = new URL(url);
+
+            connection = (HttpURLConnection) targetUrl.openConnection();
+            connection.connect();
+
+            final StringBuilder result = new StringBuilder();
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream in = connection.getInputStream();
+
+                Bitmap bitmap = BitmapFactory.decodeStream(in);
+                closeStream(in);
+
+                return bitmap;
+            }
+            return null;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
+
+        return null;
+    }
+
 
     private static void closeStream(Closeable closeable) {
         try {

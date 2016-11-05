@@ -1,8 +1,10 @@
 package in.hoku.components.sample;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import in.hoku.components.tinyhttp.R;
@@ -21,18 +23,45 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        //String url = "https://www.google.co.jp/";
-        String url = "http://www.yahoo.co.jp/";
+        switch (v.getId()) {
+            case R.id.getImageButton:
+                requestImage();
+                break;
+
+            case R.id.getTextButton:
+                requestText();
+                break;
+        }
+    }
+
+    private void requestImage() {
+        String url = "https://raw.githubusercontent.com/hoku/GithubImages/master/TinyHttp/TinyHttpImage.png";
+
+        TinyHttp tinyHttp = new TinyHttp();
+        tinyHttp.getImageAsync(url, new TinyHttp.OnTinyHttpLoadedImageListener() {
+            @Override
+            public void done(Bitmap bitmap) {
+                displayImage(bitmap);
+            }
+        });
+    }
+
+    private void requestText() {
+        String url = "https://raw.githubusercontent.com/hoku/GithubImages/master/TinyHttp/TinyHttpText.txt";
 
         TinyHttp tinyHttp = new TinyHttp();
         tinyHttp.setResponseContentEncoding("UTF-8");
-        tinyHttp.getText(url, new TinyHttp.OnTinyHttpStateListener() {
+        tinyHttp.getTextAsync(url, new TinyHttp.OnTinyHttpLoadedTextListener() {
             @Override
-            public void done(String result) {
-                result = result.substring(0, 3000);
-                displayText(result + " .........");
+            public void done(String text) {
+                displayText(text);
             }
         });
+    }
+
+    private void displayImage(Bitmap bmp) {
+        ImageView imageView = (ImageView) findViewById(R.id.mainImage);
+        imageView.setImageBitmap(bmp);
     }
 
     private void displayText(String text) {

@@ -6,11 +6,23 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/connectionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="image"
+        android:id="@+id/getImageButton"
+        android:onClick="onClick" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mainImage" />
+
+    <Button
+        android:id="@+id/getTextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onClick"
-        android:text="New Button" />
+        android:text="text" />
 
     <ScrollView
         android:layout_width="match_parent"
