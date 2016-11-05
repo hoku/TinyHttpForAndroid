@@ -1,5 +1,6 @@
 package in.hoku.components.tinyhttp;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -75,6 +76,41 @@ public class TinyHttp {
             }
         };
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public Bitmap getImageOrCache(Context context, final String url) {
+        TinyHttpImageCache imageCache = new TinyHttpImageCache(context);
+        Bitmap bitmap = imageCache.loadCache(url);
+        if (bitmap != null) {
+            return bitmap;
+        } else {
+            Bitmap dlBitmap = getImage(url);
+            imageCache.cacheImage(url, dlBitmap);
+            return dlBitmap;
+        }
+    }
+
+    public void getImageOrCacheAsync(final Context context, final String url, final OnTinyHttpLoadedImageListener l) {
+        AsyncTask<Void, Void, Bitmap> task = new AsyncTask<Void, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                return getImageOrCache(context, url);
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap result) {
+                if (l != null) {
+                    l.done(result);
+                }
+            }
+        };
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+
+    public void deleteImageCacheAll(Context context) {
+        TinyHttpImageCache imageCache = new TinyHttpImageCache(context);
+        imageCache.deleteCacheAll();
     }
 
 

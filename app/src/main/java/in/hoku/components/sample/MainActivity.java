@@ -38,7 +38,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         String url = "https://raw.githubusercontent.com/hoku/GithubImages/master/TinyHttp/TinyHttpImage.png";
 
         TinyHttp tinyHttp = new TinyHttp();
-        tinyHttp.getImageAsync(url, new TinyHttp.OnTinyHttpLoadedImageListener() {
+        tinyHttp.deleteImageCacheAll(this);
+        tinyHttp.getImageOrCacheAsync(this, url, new TinyHttp.OnTinyHttpLoadedImageListener() {
             @Override
             public void done(Bitmap bitmap) {
                 displayImage(bitmap);
