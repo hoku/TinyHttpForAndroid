@@ -14,7 +14,7 @@ import java.net.URL;
 /**
  * Name:    TinyHttp
  * URL:     https://github.com/hoku/TinyHttpForAndroid
- * License: CC0
+ * License: MIT
  * <p/>
  * Created by hoku.
  */
